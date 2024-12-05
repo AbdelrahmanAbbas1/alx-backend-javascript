@@ -9,8 +9,12 @@ app.get('/', (req, res) => {
 });
 
 app.get('/students', async (req, res) => {
-  const studentData = await countStudents('database.csv');
-  res.send(`This is the list of our students\n${studentData}`);
+  try {
+    const studentData = await countStudents(process.argv[2]);
+    res.send(`This is the list of our students\n${studentData}`);
+  } catch (err) {
+    throw new Error('Cannot load the database');
+  }
 });
 
 app.listen(port, () => {

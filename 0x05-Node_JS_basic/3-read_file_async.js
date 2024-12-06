@@ -1,55 +1,34 @@
-const fs = require('fs');
+const fs = require('node:fs/promises');
 
-function countStudents(filePath) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf-8', (err, data) => {
-      if (err) {
-        reject(new Error('Cannot load the database'));
-        return;
+async function countStudents(path) {
+  try {
+    const data = await fs.readFile(path, 'utf8');
+    const chunk = data.split('\n');
+    const lines = chunk.slice(1);
+    const sweList = [];
+    const csList = [];
+    let sweNumber = 0;
+    let csNumber = 0;
+    console.log(`Number of students: ${lines.length}`);
+    lines.forEach((val) => {
+      const line = val.split(',');
+      if (line[3] === 'CS') {
+        csNumber += 1;
+        csList.push(line[0]);
+      } else if (line[3] === 'SWE') {
+        sweNumber += 1;
+        sweList.push(line[0]);
       }
-      const lines = data.split('\n').filter((line) => line.trim() !== '');
-
-      if (lines.length <= 1) {
-        console.log('Number of students: 0');
-        resolve();
-        return;
-      }
-
-      const header = lines[0].split(',');
-      const studentData = lines.slice(1);
-
-      const fieldCounts = {};
-      const fieldLists = {};
-
-      studentData.forEach((line) => {
-        const student = line.split(',');
-
-        if (student.length === header.length) {
-          const field = student[header.length - 1];
-          const firstName = student[0];
-
-          if (!fieldCounts[field]) {
-            fieldCounts[field] = 0;
-            fieldLists[field] = [];
-          }
-
-          fieldCounts[field] += 1;
-          fieldLists[field].push(firstName);
-        }
-      });
-      console.log(`Number of students: ${studentData.length}`);
-
-      // eslint-disable-next-line guard-for-in
-      for (const field in fieldCounts) {
-        console.log(
-          `Number of students in ${field}: ${
-            fieldCounts[field]
-          }. List: ${fieldLists[field].join(', ')}`,
-        );
-      }
-      resolve();
     });
-  });
+    console.log(`Number of students in CS: ${csNumber}. List: ${csList.join(', ')}`);
+    console.log(`Number of students in SWE: ${sweNumber}. List: ${sweList.join(', ')}`);
+    const studentData = `Number of students: ${lines.length}\n`
+    + `Number of students in CS: ${csNumber}. List: ${csList.join(', ')}\n`
+    + `Number of students in SWE: ${sweNumber}. List: ${sweList.join(', ')}\n`;
+    return studentData;
+  } catch (err) {
+    throw new Error('Cannot load the database');
+  }
 }
 
 module.exports = countStudents;

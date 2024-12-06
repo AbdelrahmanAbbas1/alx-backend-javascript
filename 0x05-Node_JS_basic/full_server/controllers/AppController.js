@@ -1,8 +1,9 @@
 class AppController {
   static getHomePage(req, res) {
-    res.send('Hello ALX!');
+    res.status(200).send('Hello ALX!');
     return res.status;
   }
 }
 
-export default AppController.getHomePage;
+export default AppController;
+module.exports = AppController;

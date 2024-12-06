@@ -1,4 +1,4 @@
-const fs = require('fs/promises');
+import fs from 'fs/promises';
 
 async function readDatabase(path) {
   try {
@@ -21,4 +21,5 @@ async function readDatabase(path) {
   }
 }
 
+export default readDatabase;
 module.exports = readDatabase;

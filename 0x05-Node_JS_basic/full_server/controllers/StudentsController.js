@@ -1,39 +1,37 @@
-const readDatabase = require('../utils');
+import readDatabase from '../utils';
 
 const path = process.argv[process.argv.length - 1];
 
 class StudentsController {
-  static getAllStudents(req, res) {
-    res.send('This is the list of our students');
-    const studentData = readDatabase(path);
+  static async getAllStudents(req, res) {
+    try {
+      const studentData = await readDatabase(path);
+      let response = 'This is the list of our students';
 
-    studentData.then((data) => {
-      Object.entries(data).forEach(([field, students]) => {
-        res.send(`Number of students in ${field}: ${students.length}. List: ${[...students].join(', ')}`);
-        return res.status;
+      Object.entries(studentData).forEach(([field, students]) => {
+        response += `\nNumber of students in ${field}: ${students.length}. List: ${students.join(', ')}`;
       });
-    }).catch(() => {
-      res.send('Cannot load the database');
-      return res.status;
-    });
+      res.status(200).send(response);
+    } catch (err) {
+      res.status(500).send('Cannot load the database');
+    }
   }
 
-  static getAllStudentsbyMajor(req, res) {
+  static async getAllStudentsbyMajor(req, res) {
     const { major } = req.params;
 
     if (major === 'CS' || major === 'SWE') {
-      const studentData = readDatabase(path);
-
-      studentData.then((data) => {
-        res.send(`List: ${[...data[major]].join(', ')}`);
-      }).catch(() => {
-        res.send('Cannot load the database');
-        return res.status;
-      });
+      try {
+        const studentData = await readDatabase(path);
+        res.status(200).send(`List: ${studentData[major].join(', ')}`);
+      } catch (err) {
+        res.status(500).send('Cannot load the database');
+      }
+    } else {
+      res.status(500).send('Major parameter must be CS or SWE');
     }
-    res.send('Major parameter must be CS or SWE');
-    return res.status;
   }
 }
 
 export default StudentsController;
+module.exports = StudentsController;

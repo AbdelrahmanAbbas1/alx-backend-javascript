@@ -1,9 +1,11 @@
-import app from '../server';
-import getHomePage from '../controllers/AppController';
-import { getAllStudents, getAllStudentsbyMajor } from '../controllers/StudentsController';
+import AppController from '../controllers/AppController';
+import StudentsController from '../controllers/StudentsController';
 
-app.get('/', getHomePage);
+const routes = (app) => {
+  app.get('/', AppController.getHomePage);
+  app.get('/students', StudentsController.getAllStudents);
+  app.get('/students/:major', StudentsController.getAllStudentsbyMajor);
+};
 
-app.get('/students', getAllStudents);
-
-app.get('/students:major', getAllStudentsbyMajor);
+export default routes;
+module.export = routes;
